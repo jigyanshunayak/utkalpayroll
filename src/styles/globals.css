@@ -1,0 +1,225 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family:Montserrat, sans-serif ;
+  scroll-behavior: smooth;
+  box-sizing: border-box
+}
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box
+}
+@layer components {
+  .main-container {
+    @apply container mx-auto px-24;
+  }
+  .main-containerAdmin {
+    @apply container mx-auto px-6;
+  }
+  .center {
+    @apply flex items-center justify-center;
+  }
+  .center_column {
+    @apply flex flex-col items-center justify-center;
+  }
+  .center_between {
+    @apply flex items-center justify-between;
+  }
+  .start_column {
+    @apply flex flex-col items-start justify-center;
+  }
+  .navSpan {
+    @apply h-16  flex items-center justify-evenly cursor-pointer  relative;
+  }
+  .resNavDiv {
+    @apply w-full p-2 text-white text-start text-lg font-bold border border-gray-800 bg-gray-700 capitalize;
+  }
+  .navH1 {
+    @apply  font-bold capitalize;
+  }
+}
+
+.notchedOutline {
+  border: none !important;
+}
+.input-field {
+  background-color: white !important;
+  border-radius: 0.25rem !important;
+  width: 100% !important;
+}
+.input-field_one {
+  height: 0.6rem !important;
+  min-height: 0.5rem !important;
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+  width: 100% !important;
+}
+.mui-multi-row .input-field {
+  padding: 16.5px 14px;
+}
+.mui-multi-row .MuiInputBase-multiline {
+  padding: 0 !important;
+}
+
+.center_column_between {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.my_animation_slide {
+  animation: slide 0.3s ease-in-out;
+}
+
+.discount-card:hover::before {
+  animation: shine 1.3s;
+  display: block;
+}
+.discount-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  display: none;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  transform: skewX(-25deg);
+}
+
+.outline-style input:focus {
+  outline-width: 0px !important;
+}
+
+.filter-select fieldset:hover {
+  border: none;
+}
+.filter-select fieldset {
+  border: none;
+}
+
+.select .MuiInputBase-input {
+  color: rgb(92, 92, 92) !important;
+}
+
+.logoWarper {
+  filter: drop-shadow(1px 1px 1px rgb(98, 98, 98));
+}
+.logoWarper_two {
+  filter: drop-shadow(10px 15px 15px rgb(0, 0, 9));
+}
+.logoWarper_one {
+  filter: drop-shadow(0px 0px 01px rgb(255, 255, 255));
+}
+.gradient-text_3 {
+  background: linear-gradient(
+    91.58deg,
+    #9a1bfe 25.86%,
+    #8469ee 45.86%,
+    #3ba5fd 71.46%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gradient-text_4 {
+  background: linear-gradient(91.58deg, #2600ff, #ff0011);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cardShadow {
+  box-shadow: 7px 7px 15px 0px #0e1015;
+}
+.slick-dot li {
+  background: white;
+  font-size: 4rem;
+  list-style: disc;
+}
+.slick-dots li button:before {
+  color: rgb(255, 0, 153) !important;
+}
+
+.slick-dots li.slick-active button:before {
+  color: white !important;
+}
+.focusItem fieldset {
+  border-color: #e7e7e7 !important;
+}
+
+
+.flip-card {
+  background-color: transparent;
+  width: 380px;
+  height: 100%;
+  perspective: 1000px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.flip-card-front {
+  background-color: #bbb;
+  color: black;
+}
+
+.flip-card-back {
+  color: white;
+  transform: rotateY(180deg);
+}
+
+/* -------------------------------------------------------------------------------------------------- */
+/* Animations */
+
+@keyframes slide {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+  100% {
+    left: 100%;
+    opacity: 1;
+  }
+}
+
+.element::-webkit-scrollbar { width: 0 !important }
