@@ -19,6 +19,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useRouter } from 'next/router';
 
 interface FamilyMember {
   id: number;
@@ -36,6 +37,7 @@ const FamilyDetails: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState<Partial<FamilyMember>>({});
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Fetch initial data from the backend
@@ -91,6 +93,7 @@ const FamilyDetails: React.FC = () => {
           headers: {
             'Content-Type': 'application/json'
           },
+          body: JSON.stringify(formData)
         });
         if (!response.ok) throw new Error('Failed to update family details');
         const updatedData: FamilyMember = await response.json();
@@ -112,6 +115,7 @@ const FamilyDetails: React.FC = () => {
         setFamilyData([...familyData, newFamilyMember]);
       }
       handleCloseDialog();
+      router.push('/financialDetails'); // Navigate to the desired route upon successful form submission
     } catch (error) {
       console.error('Error submitting data:', error);
     }
@@ -224,35 +228,29 @@ const FamilyDetails: React.FC = () => {
                 label="Date of Birth"
                 name="dob"
                 type="date"
+                InputLabelProps={{ shrink: true }}
                 value={formData.dob || ''}
                 onChange={handleInputChange}
-                InputLabelProps={{ shrink: true }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Select
+              <TextField
                 fullWidth
                 label="Blood Group"
                 name="bloodGroup"
                 value={formData.bloodGroup || ''}
-                onChange={handleSelectChange}
-              >
-                <MenuItem value="A+">A+</MenuItem>
-                <MenuItem value="A-">A-</MenuItem>
-                <MenuItem value="B+">B+</MenuItem>
-                <MenuItem value="B-">B-</MenuItem>
-                <MenuItem value="O+">O+</MenuItem>
-                <MenuItem value="O-">O-</MenuItem>
-                <MenuItem value="AB+">AB+</MenuItem>
-                <MenuItem value="AB-">AB-</MenuItem>
-              </Select>
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" onClick={handleSubmit}>
-                {editingIndex !== null ? 'Update' : 'Submit'}
-              </Button>
+                onChange={handleInputChange}
+              />
             </Grid>
           </Grid>
+          <div className="flex justify-end mt-4">
+            <Button variant="contained" color="primary" onClick={handleSubmit}>
+              {editingIndex !== null ? 'Update' : 'Add'}
+            </Button>
+            <Button variant="outlined" color="secondary" onClick={handleCloseDialog} className="ml-2">
+              Cancel
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

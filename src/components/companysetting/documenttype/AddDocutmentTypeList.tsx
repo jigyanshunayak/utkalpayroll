@@ -9,14 +9,32 @@ import {
   Button,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-interface DialogComponentProps {
+import axios from 'axios';
+
+interface AddDocumentTypeProps {
   open: boolean;
-  handleClose: () => void;
+  setOpen: (open: boolean) => void;
 }
 
-const  AddDocumentTypeList= ({open, setOpen}:any) => {
+const AddDocumentType: React.FC<AddDocumentTypeProps> = ({ open, setOpen }) => {
+  const [documentTypeName, setDocumentTypeName] = useState<string>("");
 
-
+  const handleSubmit = async () => {
+    try {
+      await axios.post('http://localhost:6567/api/v1/documentType/create', {
+        documentTypeName
+      }, {
+        withCredentials: true,
+      });
+      alert('Document type added successfully!');
+      setDocumentTypeName("");
+      setOpen(false);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error adding document type:', error);
+      alert('Failed to add document type');
+    }
+  };
 
 
   return (
@@ -48,13 +66,14 @@ const  AddDocumentTypeList= ({open, setOpen}:any) => {
           type="text"
           fullWidth
           variant="outlined"
-         
+          value={documentTypeName}
+          onChange={(e) => setDocumentTypeName(e.target.value)}
         
         />
       </DialogContent>
       <DialogActions>
         
-        <Button className='bg-blue-500 text-white py-2 px-4 hover:bg-blue-800 shadow-slate-400  rounded cursor-pointer ' onClick={()=>{setOpen(false)}}>
+        <Button className='bg-blue-500 text-white py-2 px-4 hover:bg-blue-800 shadow-slate-400  rounded cursor-pointer ' onClick={handleSubmit}>
           Submit
         </Button>
       </DialogActions>
@@ -62,4 +81,4 @@ const  AddDocumentTypeList= ({open, setOpen}:any) => {
   );
 };
 
-export default AddDocumentTypeList
+export default AddDocumentType

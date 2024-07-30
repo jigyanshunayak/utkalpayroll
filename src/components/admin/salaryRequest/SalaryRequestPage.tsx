@@ -10,7 +10,8 @@ import {
   Paper,
   Typography,
   Button,
-  TablePagination
+  TablePagination,
+  Box
 } from '@mui/material';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 
@@ -69,43 +70,53 @@ const SalaryRequestPage: React.FC = () => {
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell className="bg-violet-500 text-white shadow-[-4px_4px_27px_0px_#6B23CA]">NAME</TableCell>
-              <TableCell className="bg-violet-500 text-white shadow-[-4px_4px_27px_0px_#6B23CA]">AMOUNT</TableCell>
-              <TableCell className="bg-violet-500 text-white shadow-[-4px_4px_27px_0px_#6B23CA]">EMI</TableCell>
-              <TableCell className="bg-violet-500 text-white shadow-[-4px_4px_27px_0px_#6B23CA]">REASON</TableCell>
-              <TableCell className="bg-violet-500 text-white shadow-[-4px_4px_27px_0px_#6B23CA]">STATUS</TableCell>
-              <TableCell className="bg-violet-500 text-white shadow-[-4px_4px_27px_0px_#6B23CA]">APPROVE/REJECT</TableCell>
+            <TableRow className="bg-gradient-to-t from-[#6B23CA] to-[#F4ECFF]">
+              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">NAME</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">AMOUNT</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">EMI</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">REASON</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">STATUS</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">APPROVE/REJECT</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {salaryRequestData.map((request) => (
               <TableRow key={request.id}>
-                <TableCell>{request.name}</TableCell>
-                <TableCell>{request.amount}</TableCell>
-                <TableCell>{request.emi}</TableCell>
-                <TableCell>{request.reason}</TableCell>
+                <TableCell className="text-black font-bold text-center">{request.name}</TableCell>
+                <TableCell className="text-black font-bold text-center">{request.amount}</TableCell>
+                <TableCell className="text-black font-bold text-center">{request.emi}</TableCell>
+                <TableCell className="text-black font-bold text-center">{request.reason}</TableCell>
                 <TableCell className={getStatusStyle(request.status)}>
                   {request.status}
                 </TableCell>
-                <TableCell>
-                  {request.status === 'Pending' ? (
-                    <div className="">
-                      <Button variant="contained" color="primary" onClick={() => handleApprove(request.id)} className='bg-blue-600 hover:bg-blue-800 rounded-3xl p-2'>
-                        Approve
-                      </Button>
-                      <Button variant="contained" color="error" onClick={() => handleReject(request.id)} className='bg-red-600 hover:bg-red-800 rounded-3xl'>
-                        Reject
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="bg-green-500  p-2 rounded-3xl w-24">
-                      <Typography variant="body1" color="textPrimary" className='flex justify-center'>
-                        Approved
-                      </Typography>
-                    </div>
-                  )}
-                </TableCell>
+                <TableCell className="flex gap-2 justify-center">
+                    {request.status === 'Pending' ? (
+                      <>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          className="px-4 py-1 rounded-full bg-blue-800"
+                          onClick={() => handleApprove(request.id)}
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          className="px-4 py-1 rounded-full bg-red-800"
+                          onClick={() => handleReject(request.id)}
+                        >
+                          Reject
+                        </Button>
+                      </>
+                    ) : (
+                      <Box className="bg-green-500 p-2 px-4 py-1 rounded-full">
+                        <Typography variant="body1" color="textPrimary" className="flex justify-center">
+                          Approved
+                        </Typography>
+                      </Box>
+                    )}
+                  </TableCell>
               </TableRow>
             ))}
           </TableBody>

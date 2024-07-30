@@ -2,6 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
+export const LOGOUT = 'LOGOUT';
 
 export const login = (username, password) => async (dispatch) => {
     try {
@@ -33,4 +34,9 @@ export const fetchAdminProfile = () => async (dispatch) => {
       payload: error.response ? error.response.data : 'Something went wrong',
     });
   }
+};
+export const logout = () => (dispatch) => {
+  localStorage.removeItem('token');
+  Cookies.remove('accessToken');
+  dispatch({ type: LOGOUT });
 };

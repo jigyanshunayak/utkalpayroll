@@ -9,16 +9,32 @@ import {
   Button,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-interface DialogComponentProps {
+import axios from 'axios';
+
+interface AddReimbursementProps {
   open: boolean;
-  handleClose: () => void;
+  setOpen: (open: boolean) => void;
 }
 
-const AddReimbursmentLists= ({open, setOpen}:any) => {
+const AddReimbursement: React.FC<AddReimbursementProps> = ({ open, setOpen }) => {
+  const [reimbursementName, setReimbursementName] = useState<string>("");
 
-
-
-
+  const handleSubmit = async () => {
+    try {
+      await axios.post('http://localhost:6567/api/v1/reimbursement/create', {
+        reimbursementName
+      }, {
+        withCredentials: true,
+      });
+      alert('Reimbursement added successfully!');
+      setReimbursementName("");
+      setOpen(false);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error adding reimbursement:', error);
+      alert('Failed to add reimbursement');
+    }
+  };
   return (
     <Dialog open={open} onClose={()=>{setOpen(false)}} classes={{ paper: 'rounded-lg' }}   PaperProps={{
         style: {
@@ -48,13 +64,14 @@ const AddReimbursmentLists= ({open, setOpen}:any) => {
           type="text"
           fullWidth
           variant="outlined"
-         
+          value={reimbursementName}
+          onChange={(e) => setReimbursementName(e.target.value)}
         
         />
       </DialogContent>
       <DialogActions>
         
-        <Button className='bg-blue-500 text-white py-2 px-4 hover:bg-blue-800 shadow-slate-400  rounded cursor-pointer ' onClick={()=>{setOpen(false)}}>
+        <Button className='bg-blue-500 text-white py-2 px-4 hover:bg-blue-800 shadow-slate-400  rounded cursor-pointer ' onClick={handleSubmit}>
           Submit
         </Button>
       </DialogActions>
@@ -62,4 +79,4 @@ const AddReimbursmentLists= ({open, setOpen}:any) => {
   );
 };
 
-export default AddReimbursmentLists
+export default AddReimbursement

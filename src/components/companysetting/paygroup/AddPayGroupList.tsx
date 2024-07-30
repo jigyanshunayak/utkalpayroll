@@ -9,13 +9,36 @@ import {
   Button,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import axios from 'axios';
 interface DialogComponentProps {
   open: boolean;
   handleClose: () => void;
 }
 
 const  AddPayGroupList= ({open, setOpen}:any) => {
+  const [paygroupname, setLeave]= useState("")
 
+  const handleSubmit = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post('http://localhost:6567/api/v1/paygroup/create', {
+        paygroupname,
+      }, {
+        withCredentials: true,
+      });
+
+      if (response.status === 201) {
+        alert('PayGroup Created successfully!!!');
+        setOpen(false);
+        // onDesignationAdded(); // Call the callback to refresh the data
+      } else {
+        alert('Error creating PayGroup');
+      }
+    } catch (error) {
+      console.error('There was an error!', error);
+      alert('Error creating PayGroup');
+    }
+  };
 
 
 
@@ -48,13 +71,14 @@ const  AddPayGroupList= ({open, setOpen}:any) => {
           type="text"
           fullWidth
           variant="outlined"
-         
+          value={paygroupname}
+          onChange={(e) => setLeave(e.target.value)}
         
         />
       </DialogContent>
       <DialogActions>
         
-        <Button className='bg-blue-500 text-white py-2 px-4 hover:bg-blue-800 shadow-slate-400  rounded cursor-pointer ' onClick={()=>{setOpen(false)}}>
+        <Button className='bg-blue-500 text-white py-2 px-4 hover:bg-blue-800 shadow-slate-400  rounded cursor-pointer ' onClick={handleSubmit}>
           Submit
         </Button>
       </DialogActions>

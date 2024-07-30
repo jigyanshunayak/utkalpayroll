@@ -42,10 +42,10 @@ const ReimbursementPage: React.FC = () => {
 
   const getStatusStyle = (status: string) => {
     if (status === 'Pending') {
-      return 'text-yellow-700 text-white font-bold p-2 rounded-md text-center';
+      return 'text-yellow-400 text-white font-bold p-2 rounded-md text-center';
     }
     if (status === 'Approved') {
-      return 'text-green-600 text-white font-bold p-2 rounded-md text-center';
+      return 'text-green-400 text-white font-bold p-2 rounded-md text-center';
     }
     return '';
   };

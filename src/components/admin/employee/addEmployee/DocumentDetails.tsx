@@ -21,6 +21,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useRouter } from 'next/router';
 
 interface DocumentData {
   id: number;
@@ -36,6 +37,7 @@ const DocumentDetail: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState<Partial<DocumentData>>({});
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const router = useRouter();
 
   const handleOpenDialog = (index?: number) => {
     setEditingIndex(index ?? null);
@@ -86,6 +88,7 @@ const DocumentDetail: React.FC = () => {
       ]);
     }
     handleCloseDialog();
+    router.push('/compensationPage'); // Replace with the desired route
   };
 
   const handleDelete = (index: number) => {

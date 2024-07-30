@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import { Dialog, DialogContent, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, TextField, Grid } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -15,7 +16,6 @@ interface EducationData {
 }
 
 const initialData: EducationData[] = [
-  // Sample data
   {
     id: 1,
     degree: 'B.Tech',
@@ -25,10 +25,10 @@ const initialData: EducationData[] = [
     percentage: 85,
     division: 'First'
   },
-  // Add more sample data if needed
 ];
 
 const EducationDetails: React.FC = () => {
+  const router = useRouter();
   const [educationData, setEducationData] = useState<EducationData[]>(initialData);
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState<Partial<EducationData>>({});
@@ -59,19 +59,18 @@ const EducationDetails: React.FC = () => {
 
   const handleSubmit = () => {
     if (editingIndex !== null) {
-      // Update existing record
       const updatedData = educationData.map((item, index) =>
         index === editingIndex ? { ...item, ...formData } : item
       );
       setEducationData(updatedData);
     } else {
-      // Add new record
       setEducationData([
         ...educationData,
         { id: educationData.length + 1, ...formData } as EducationData
       ]);
     }
     handleCloseDialog();
+    router.push('/experienceDetails'); // Replace with the desired route
   };
 
   const handleDelete = (index: number) => {

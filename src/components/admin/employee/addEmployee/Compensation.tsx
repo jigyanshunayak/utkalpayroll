@@ -22,6 +22,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useRouter } from 'next/router';
 
 interface Compensation {
   id: number;
@@ -33,6 +34,7 @@ interface Compensation {
 const API_URL = 'https://your-backend-api-endpoint.com/compensation-details'; // Replace with your API URL
 
 const CompensationPage: React.FC = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     payGroup: '',
     annualCTC: '',
@@ -162,6 +164,7 @@ const CompensationPage: React.FC = () => {
           index === editingIndex ? updatedData : item
         );
         setCompensationData(updatedCompensationData);
+        router.push('/credentialForm'); // Redirect after update
       } else {
         // Add new record
         const response = await fetch(API_URL, {
@@ -169,11 +172,11 @@ const CompensationPage: React.FC = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(formData)
         });
         if (!response.ok) throw new Error('Failed to add compensation details');
         const newCompensation: Compensation = await response.json();
         setCompensationData([...compensationData, newCompensation]);
+        router.push('/compensation'); // Redirect after addition
       }
       handleCloseDialog();
     } catch (error) {
@@ -189,6 +192,7 @@ const CompensationPage: React.FC = () => {
       });
       if (!response.ok) throw new Error('Failed to delete compensation details');
       setCompensationData(compensationData.filter((_, i) => i !== index));
+      router.push('/compensation'); // Redirect after deletion
     } catch (error) {
       console.error('Error deleting data:', error);
     }
@@ -243,23 +247,18 @@ const CompensationPage: React.FC = () => {
         <DialogContent>
           <h2 className="text-xl font-bold mb-4">{editingIndex !== null ? 'Edit Compensation' : 'Add Compensation'}</h2>
           <form onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
               <Grid item xs={12}>
                 <FormControl fullWidth error={!!errors.payGroup}>
-                  <InputLabel id="pay-group-label">Select Pay Group</InputLabel>
+                  <InputLabel id="payGroup-label">Pay Group</InputLabel>
                   <Select
-                    labelId="pay-group-label"
+                    labelId="payGroup-label"
                     name="payGroup"
                     value={formData.payGroup}
                     onChange={handleSelectChange}
-                    variant="outlined"
                   >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
-                    <MenuItem value="Group A">Group A</MenuItem>
-                    <MenuItem value="Group B">Group B</MenuItem>
-                    <MenuItem value="Group C">Group C</MenuItem>
+                    <MenuItem value="Group1">Group 1</MenuItem>
+                    <MenuItem value="Group2">Group 2</MenuItem>
                   </Select>
                   <FormHelperText>{errors.payGroup}</FormHelperText>
                 </FormControl>
@@ -271,7 +270,6 @@ const CompensationPage: React.FC = () => {
                   name="annualCTC"
                   value={formData.annualCTC}
                   onChange={handleInputChange}
-                  variant="outlined"
                   error={!!errors.annualCTC}
                   helperText={errors.annualCTC}
                 />
@@ -283,20 +281,16 @@ const CompensationPage: React.FC = () => {
                   name="monthlyCTC"
                   value={formData.monthlyCTC}
                   onChange={handleInputChange}
-                  variant="outlined"
                   error={!!errors.monthlyCTC}
                   helperText={errors.monthlyCTC}
                 />
               </Grid>
+              <Grid item xs={12}>
+                <Button type="submit" variant="contained" color="primary">
+                  {editingIndex !== null ? 'Update' : 'Add'}
+                </Button>
+              </Grid>
             </Grid>
-            <div className="flex justify-end mt-4">
-              <Button onClick={handleCloseDialog} className="mr-2">
-                Cancel
-              </Button>
-              <Button type="submit" variant="contained" color="primary">
-                {editingIndex !== null ? 'Update' : 'Add'}
-              </Button>
-            </div>
           </form>
         </DialogContent>
       </Dialog>

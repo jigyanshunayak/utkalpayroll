@@ -52,10 +52,10 @@ const PayslipPage: React.FC = () => {
 
   const getStatusStyle = (status: string) => {
     if (status === 'Active') {
-      return 'text-green-500 text-white font-bold p-2 rounded-md text-center';
+      return 'text-green-400 text-white font-bold p-2 rounded-md text-center';
     }
     if (status === 'Inactive') {
-      return 'text-red-500 text-white font-bold p-2 rounded-md text-center';
+      return 'text-red-600 text-white font-bold p-2 rounded-md text-center';
     }
     return '';
   };

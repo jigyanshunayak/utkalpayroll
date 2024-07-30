@@ -9,13 +9,32 @@ import {
   Button,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-interface DialogComponentProps {
+import axios from 'axios';
+
+interface AddResignationTypeProps {
   open: boolean;
-  handleClose: () => void;
+  setOpen: (open: boolean) => void;
 }
 
-const  AddResignationList= ({open, setOpen}:any) => {
+const AddResignationList: React.FC<AddResignationTypeProps> = ({ open, setOpen }) => {
+  const [typeName, setTypeName] = useState<string>("");
 
+  const handleSubmit = async () => {
+    try {
+      await axios.post('http://localhost:6567/api/v1/resignationType/create', {
+        typeName
+      }, {
+        withCredentials: true,
+      });
+      alert('Type added successfully!');
+      setTypeName("");
+      setOpen(false);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error adding type:', error);
+      alert('Failed to add type');
+    }
+  };
 
 
 
@@ -48,13 +67,14 @@ const  AddResignationList= ({open, setOpen}:any) => {
           type="text"
           fullWidth
           variant="outlined"
-         
+          value={typeName}
+          onChange={(e) => setTypeName(e.target.value)}
         
         />
       </DialogContent>
       <DialogActions>
         
-        <Button className='bg-blue-500 text-white py-2 px-4 hover:bg-blue-800 shadow-slate-400  rounded cursor-pointer ' onClick={()=>{setOpen(false)}}>
+        <Button className='bg-blue-500 text-white py-2 px-4 hover:bg-blue-800 shadow-slate-400  rounded cursor-pointer ' onClick={handleSubmit}>
           Submit
         </Button>
       </DialogActions>

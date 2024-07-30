@@ -1,8 +1,9 @@
-import { LOGIN_FAILURE, LOGIN_SUCCESS } from "../actions/authActions";
+// reducers/authReducer.js
+import { LOGIN_FAILURE, LOGIN_SUCCESS, LOGOUT } from "../actions/authActions";
 
 const initialState = {
     user: null,
-    admin:null,
+    admin: null,
     error: null,
 };
 
@@ -19,11 +20,18 @@ const authReducer = (state = initialState, action) => {
                 ...state,
                 error: action.payload,
             };
-            case 'FETCH_ADMIN_PROFILE_SUCCESS':
-      return {
-        ...state,
-        admin: action.payload,
-      };
+        case 'FETCH_ADMIN_PROFILE_SUCCESS':
+            return {
+                ...state,
+                admin: action.payload,
+            };
+        case LOGOUT:
+            return {
+                ...state,
+                user: null,
+                admin: null,
+                error: null,
+            };
         default:
             return state;
     }

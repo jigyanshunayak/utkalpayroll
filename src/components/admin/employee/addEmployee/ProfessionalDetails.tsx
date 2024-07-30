@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
-import { TextField, Button, MenuItem, Grid, Typography } from '@mui/material';
-import axios from 'axios';
+import {
+  TextField,
+  Button,
+  Grid,
+  Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  SelectChangeEvent
+} from '@mui/material';
+import { useRouter } from 'next/router';
 
-interface FormValues {
+interface ProfessionalDetailsFormValues {
   companyName: string;
   designation: string;
   department: string;
@@ -24,12 +34,8 @@ interface FormValues {
   drivingLicense: string;
 }
 
-interface Errors {
-  [key: string]: string | undefined; // Index signature added
-}
-
 const ProfessionalDetails: React.FC = () => {
-  const [formValues, setFormValues] = useState<FormValues>({
+  const [formValues, setFormValues] = useState<ProfessionalDetailsFormValues>({
     companyName: '',
     designation: '',
     department: '',
@@ -51,114 +57,231 @@ const ProfessionalDetails: React.FC = () => {
     drivingLicense: ''
   });
 
-  const [errors, setErrors] = useState<Errors>({});
+  const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormValues({ ...formValues, [name]: value });
-    setErrors({ ...errors, [name]: '' }); // Clear error when the field is modified
+    setFormValues({
+      ...formValues,
+      [name]: value
+    });
   };
 
-  const validateForm = () => {
-    const newErrors: Errors = {};
-
-    // Basic validation rules
-    if (!formValues.companyName) newErrors.companyName = 'Company Name is required';
-    if (!formValues.designation) newErrors.designation = 'Designation is required';
-    if (!formValues.department) newErrors.department = 'Department is required';
-    if (!formValues.subDepartment) newErrors.subDepartment = 'Sub-Department is required';
-    if (!formValues.location) newErrors.location = 'Location is required';
-    if (!formValues.division) newErrors.division = 'Division is required';
-    if (!formValues.grade) newErrors.grade = 'Grade is required';
-    if (!formValues.reportingManager) newErrors.reportingManager = 'Reporting Manager\'s Name is required';
-    if (!formValues.employmentType) newErrors.employmentType = 'Employment Type is required';
-    if (!formValues.dateOfHire) newErrors.dateOfHire = 'Date of Hire is required';
-    if (!formValues.workEmail) newErrors.workEmail = 'Work Email ID is required';
-    if (!formValues.cugNo) newErrors.cugNo = 'CUG No is required';
-    if (!formValues.biometricId) newErrors.biometricId = 'Biometric ID is required';
-    if (!formValues.panNo) newErrors.panNo = 'PAN No is required';
-    if (!formValues.adharNo) newErrors.adharNo = 'Adhara No is required';
-    if (!formValues.uanNo) newErrors.uanNo = 'UAN No is required';
-    if (!formValues.esicNo) newErrors.esicNo = 'ESIC No is required';
-    if (!formValues.voterId) newErrors.voterId = 'Voter ID is required';
-    if (!formValues.drivingLicense) newErrors.drivingLicense = 'Driving License is required';
-
-    setErrors(newErrors);
-
-    return Object.keys(newErrors).length === 0;
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    const { name, value } = e.target;
+    setFormValues({
+      ...formValues,
+      [name]: value
+    });
   };
 
   const handleSubmit = () => {
-    if (validateForm()) {
-      console.log(formValues);
-      // Backend integration starts here
-      axios.post('https://your-api-endpoint.com/professional-details', formValues)
-        .then(response => {
-          console.log('Form submitted successfully:', response.data);
-          // Handle successful submission (e.g., display a success message, redirect, etc.)
-        })
-        .catch(error => {
-          console.error('Error submitting form:', error);
-          // Handle submission error (e.g., display an error message)
-        });
-      // Backend integration ends here
-    }
+    // Save form data and navigate to the next step or final step
+    router.push('/documentDetails');
   };
 
   return (
-    <div>
+    <div className="p-4 max-w-4xl mx-auto">
       <Typography variant="h4" gutterBottom>
         Professional Details
       </Typography>
       <form className="space-y-4 mt-4">
-        <Grid container spacing={2}>
-          {[
-            { label: 'Company Name', name: 'companyName' },
-            { label: 'Designation', name: 'designation', select: ['Manager', 'Developer', 'Designer', 'Analyst'] },
-            { label: 'Department', name: 'department', select: ['HR', 'Engineering', 'Marketing'] },
-            { label: 'Sub-Department', name: 'subDepartment', select: ['Recruitment', 'Development', 'Content'] },
-            { label: 'Location', name: 'location', select: ['New York', 'London', 'Berlin'] },
-            { label: 'Division', name: 'division', select: ['Division A', 'Division B'] },
-            { label: 'Grade', name: 'grade', select: ['Grade 1', 'Grade 2'] },
-            { label: 'Reporting Manager\'s Name', name: 'reportingManager' },
-            { label: 'Employment Type', name: 'employmentType', select: ['Full-time', 'Part-time', 'Contract'] },
-            { label: 'Date of Hire', name: 'dateOfHire', type: 'date' },
-            { label: 'Work Email ID', name: 'workEmail' },
-            { label: 'CUG No', name: 'cugNo' },
-            { label: 'Biometric ID', name: 'biometricId' },
-            { label: 'PAN No', name: 'panNo' },
-            { label: 'Adhara No', name: 'adharNo' },
-            { label: 'UAN No', name: 'uanNo' },
-            { label: 'ESIC No', name: 'esicNo' },
-            { label: 'Voter ID', name: 'voterId' },
-            { label: 'Driving License', name: 'drivingLicense' }
-          ].map(({ label, name, select, type }) => (
-            <Grid item xs={12} md={6} key={name}>
-              <TextField
-                fullWidth
-                label={label}
-                name={name}
-                type={type || 'text'}
-                value={formValues[name as keyof FormValues]}
-                onChange={handleChange}
-                select={!!select}
-                error={!!errors[name]}
-                helperText={errors[name]}
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Company Name"
+              name="companyName"
+              value={formValues.companyName}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Designation"
+              name="designation"
+              value={formValues.designation}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Department"
+              name="department"
+              value={formValues.department}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Sub Department"
+              name="subDepartment"
+              value={formValues.subDepartment}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Location"
+              name="location"
+              value={formValues.location}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Division"
+              name="division"
+              value={formValues.division}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Grade</InputLabel>
+              <Select
+                name="grade"
+                value={formValues.grade}
+                onChange={handleSelectChange}
               >
-                {select && select.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          ))}
+                <MenuItem value="Junior">Junior</MenuItem>
+                <MenuItem value="Senior">Senior</MenuItem>
+                <MenuItem value="Lead">Lead</MenuItem>
+                <MenuItem value="Manager">Manager</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Reporting Manager"
+              name="reportingManager"
+              value={formValues.reportingManager}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Employment Type</InputLabel>
+              <Select
+                name="employmentType"
+                value={formValues.employmentType}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="Full-Time">Full-Time</MenuItem>
+                <MenuItem value="Part-Time">Part-Time</MenuItem>
+                <MenuItem value="Contract">Contract</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Date of Hire"
+              name="dateOfHire"
+              type="date"
+              value={formValues.dateOfHire}
+              onChange={handleChange}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Work Email"
+              name="workEmail"
+              value={formValues.workEmail}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="CUG No"
+              name="cugNo"
+              value={formValues.cugNo}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Biometric ID"
+              name="biometricId"
+              value={formValues.biometricId}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="PAN No"
+              name="panNo"
+              value={formValues.panNo}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Aadhaar No"
+              name="adharNo"
+              value={formValues.adharNo}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="UAN No"
+              name="uanNo"
+              value={formValues.uanNo}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="ESIC No"
+              name="esicNo"
+              value={formValues.esicNo}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Voter ID"
+              name="voterId"
+              value={formValues.voterId}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Driving License"
+              name="drivingLicense"
+              value={formValues.drivingLicense}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} className="text-right">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+          </Grid>
         </Grid>
-        <div className="flex justify-end mt-4">
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Save
-          </Button>
-        </div>
       </form>
     </div>
   );

@@ -16,6 +16,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useRouter } from 'next/router';
 
 interface ExperienceData {
   id: number;
@@ -33,6 +34,7 @@ const ExperienceDetails: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState<Partial<ExperienceData>>({});
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Fetch initial data from the backend
@@ -80,6 +82,7 @@ const ExperienceDetails: React.FC = () => {
           headers: {
             'Content-Type': 'application/json'
           },
+          body: JSON.stringify(formData)
         });
         if (!response.ok) throw new Error('Failed to update experience details');
         const updatedData: ExperienceData = await response.json();
@@ -94,13 +97,14 @@ const ExperienceDetails: React.FC = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(formData)
+
         });
         if (!response.ok) throw new Error('Failed to add experience details');
         const newExperience: ExperienceData = await response.json();
         setExperienceData([...experienceData, newExperience]);
       }
       handleCloseDialog();
+      router.push('/familyDetails');
     } catch (error) {
       console.error('Error submitting data:', error);
     }

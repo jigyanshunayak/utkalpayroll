@@ -13,7 +13,7 @@ import axios from 'axios';
 interface AddDesignationListProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  onDesignationAdded: () => void; // Callback function prop
+  onDesignationAdded: () => void;
 }
 
 const AddDesignationList: React.FC<AddDesignationListProps> = ({ open, setOpen, onDesignationAdded }) => {
@@ -31,7 +31,7 @@ const AddDesignationList: React.FC<AddDesignationListProps> = ({ open, setOpen, 
       if (response.status === 201) {
         alert('Designation Created successfully!!!');
         setOpen(false);
-        onDesignationAdded(); // Call the callback to refresh the data
+        onDesignationAdded();
       } else {
         alert('Error creating designation');
       }

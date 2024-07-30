@@ -1,29 +1,23 @@
 import React, { useState } from 'react';
 import {
-  Grid,
   TextField,
+  Button,
+  Grid,
+  Typography,
   Select,
   MenuItem,
-  FormControl,
   InputLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  Checkbox,
-  Button,
-  IconButton,
-  SelectChangeEvent,
+  FormControl,
+  SelectChangeEvent
 } from '@mui/material';
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-// Make sure this is the correct path to your MainLayout component
+import { useRouter } from 'next/router';
 
-interface FormData {
-  title: string;
+interface PersonalDetailsFormValues {
   firstName: string;
   middleName: string;
   lastName: string;
   email: string;
-  dob: string;
+  dateOfBirth: string;
   maritalStatus: string;
   bloodGroup: string;
   nationality: string;
@@ -34,17 +28,16 @@ interface FormData {
   gender: string;
   permanentAddress: string;
   presentAddress: string;
-  sameAddress: boolean;
+  isSameAddress: boolean;
 }
 
 const PersonalDetails: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    title: '',
+  const [formValues, setFormValues] = useState<PersonalDetailsFormValues>({
     firstName: '',
     middleName: '',
     lastName: '',
     email: '',
-    dob: '',
+    dateOfBirth: '',
     maritalStatus: '',
     bloodGroup: '',
     nationality: '',
@@ -55,261 +48,241 @@ const PersonalDetails: React.FC = () => {
     gender: '',
     permanentAddress: '',
     presentAddress: '',
-    sameAddress: false,
+    isSameAddress: false
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = e.target as HTMLInputElement;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value,
-    });
-  };
+  const router = useRouter();
 
-  const handleSelectChange = (event: SelectChangeEvent<string>) => {
-    const { name, value } = event.target;
-    setFormData({
-      ...formData,
-      [name as keyof FormData]: value,
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Replace with your API endpoint
-    const apiUrl = 'https://your-backend-api.com/endpoint';
-
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    if (type === 'checkbox') {
+      setFormValues({
+        ...formValues,
+        [name]: checked
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Form submitted successfully:', data);
-        // Add any additional success handling logic here
-      } else {
-        console.error('Form submission error:', response.statusText);
-        // Add any additional error handling logic here
-      }
-    } catch (error) {
-      console.error('Form submission error:', error);
-      // Add any additional error handling logic here
+    } else {
+      setFormValues({
+        ...formValues,
+        [name]: value
+      });
     }
   };
 
-  return (
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    const { name, value } = e.target;
+    setFormValues({
+      ...formValues,
+      [name]: value
+    });
+  };
 
-      <div className="p-4">
-        <Button
-          className="mb-4"
-          startIcon={<AddPhotoAlternateIcon />}
-          variant="contained"
-          color="primary"
-        >
-          Add Photo
-        </Button>
-        <form onSubmit={handleSubmit}>
-          <section className="py-8">
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Title</InputLabel>
-                  <Select
-                    name="title"
-                    value={formData.title}
-                    onChange={handleSelectChange}
-                  >
-                    <MenuItem value="Mr">Mr</MenuItem>
-                    <MenuItem value="Ms">Ms</MenuItem>
-                    <MenuItem value="Mrs">Mrs</MenuItem>
-                    <MenuItem value="Dr">Dr</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="First Name"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Middle Name"
-                  name="middleName"
-                  value={formData.middleName}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Last Name"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Date of Birth"
-                  name="dob"
-                  type="date"
-                  value={formData.dob}
-                  onChange={handleInputChange}
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Marital Status</InputLabel>
-                  <Select
-                    name="maritalStatus"
-                    value={formData.maritalStatus}
-                    onChange={handleSelectChange}
-                  >
-                    <MenuItem value="Single">Single</MenuItem>
-                    <MenuItem value="Married">Married</MenuItem>
-                    <MenuItem value="Divorced">Divorced</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Blood Group</InputLabel>
-                  <Select
-                    name="bloodGroup"
-                    value={formData.bloodGroup}
-                    onChange={handleSelectChange}
-                  >
-                    <MenuItem value="A+">A+</MenuItem>
-                    <MenuItem value="A-">A-</MenuItem>
-                    <MenuItem value="B+">B+</MenuItem>
-                    <MenuItem value="B-">B-</MenuItem>
-                    <MenuItem value="O+">O+</MenuItem>
-                    <MenuItem value="O-">O-</MenuItem>
-                    <MenuItem value="AB+">AB+</MenuItem>
-                    <MenuItem value="AB-">AB-</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Nationality"
-                  name="nationality"
-                  value={formData.nationality}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Phone Number"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Emergency Phone Number"
-                  name="emergencyPhoneNumber"
-                  value={formData.emergencyPhoneNumber}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Alternative Contact Number"
-                  name="alternativeContactNumber"
-                  value={formData.alternativeContactNumber}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Religion"
-                  name="religion"
-                  value={formData.religion}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl component="fieldset">
-                  <RadioGroup
-                    row
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleInputChange}
-                  >
-                    <FormControlLabel value="male" control={<Radio />} label="Male" />
-                    <FormControlLabel value="female" control={<Radio />} label="Female" />
-                    <FormControlLabel value="other" control={<Radio />} label="Other" />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Permanent Address"
-                  name="permanentAddress"
-                  value={formData.permanentAddress}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Present Address"
-                  name="presentAddress"
-                  value={formData.sameAddress ? formData.permanentAddress : formData.presentAddress}
-                  onChange={handleInputChange}
-                  disabled={formData.sameAddress}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="sameAddress"
-                      checked={formData.sameAddress}
-                      onChange={handleInputChange}
-                    />
-                  }
-                  label="Is present and permanent address the same?"
-                />
-              </Grid>
-              <Grid item xs={12} className="text-right">
-                <Button type="submit" variant="contained" color="primary">
-                  Submit
-                </Button>
-              </Grid>
-            </Grid>
-          </section>
-        </form>
-      </div>
+  const handleSubmit = () => {
+    // Save form data and navigate to the next step or final step
+    router.push('/professionalDetails');
+  };
+
+  return (
+    <div className="p-4 max-w-4xl mx-auto">
+      <Typography variant="h4" gutterBottom>
+        Personal Details
+      </Typography>
+      <form className="space-y-4 mt-4">
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              label="First Name"
+              name="firstName"
+              value={formValues.firstName}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              label="Middle Name"
+              name="middleName"
+              value={formValues.middleName}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              label="Last Name"
+              name="lastName"
+              value={formValues.lastName}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              type="email"
+              value={formValues.email}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Date of Birth"
+              name="dateOfBirth"
+              type="date"
+              value={formValues.dateOfBirth}
+              onChange={handleChange}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Marital Status</InputLabel>
+              <Select
+                name="maritalStatus"
+                value={formValues.maritalStatus}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="Single">Single</MenuItem>
+                <MenuItem value="Married">Married</MenuItem>
+                <MenuItem value="Divorced">Divorced</MenuItem>
+                <MenuItem value="Widowed">Widowed</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Blood Group</InputLabel>
+              <Select
+                name="bloodGroup"
+                value={formValues.bloodGroup}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="A+">A+</MenuItem>
+                <MenuItem value="A-">A-</MenuItem>
+                <MenuItem value="B+">B+</MenuItem>
+                <MenuItem value="B-">B-</MenuItem>
+                <MenuItem value="AB+">AB+</MenuItem>
+                <MenuItem value="AB-">AB-</MenuItem>
+                <MenuItem value="O+">O+</MenuItem>
+                <MenuItem value="O-">O-</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Nationality"
+              name="nationality"
+              value={formValues.nationality}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Phone Number"
+              name="phoneNumber"
+              value={formValues.phoneNumber}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Emergency Phone Number"
+              name="emergencyPhoneNumber"
+              value={formValues.emergencyPhoneNumber}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Alternative Contact Number"
+              name="alternativeContactNumber"
+              value={formValues.alternativeContactNumber}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Religion"
+              name="religion"
+              value={formValues.religion}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Gender</InputLabel>
+              <Select
+                name="gender"
+                value={formValues.gender}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="Male">Male</MenuItem>
+                <MenuItem value="Female">Female</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Permanent Address"
+              name="permanentAddress"
+              multiline
+              rows={3}
+              value={formValues.permanentAddress}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Present Address"
+              name="presentAddress"
+              multiline
+              rows={3}
+              value={formValues.presentAddress}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl>
+              <InputLabel>Is Present and Permanent Address the Same?</InputLabel>
+              <Select
+                name="isSameAddress"
+                fullWidth
+                value={formValues.isSameAddress ? 'Yes' : 'No'}
+                onChange={(e: SelectChangeEvent<string>) =>
+                  setFormValues({
+                    ...formValues,
+                    isSameAddress: e.target.value === 'Yes'
+                  })
+                }
+              >
+                <MenuItem value="Yes">Yes</MenuItem>
+                <MenuItem value="No">No</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} className="text-right">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
+      </form>
+    </div>
   );
 };
 

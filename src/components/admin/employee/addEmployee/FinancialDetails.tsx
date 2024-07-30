@@ -4,6 +4,7 @@ import {
   Grid,
   Button,
 } from '@mui/material';
+import { useRouter } from 'next/router';
 
 const FinancialDetail: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const FinancialDetail: React.FC = () => {
     bankAccountNumber: '',
     bankHolderName: ''
   });
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,6 +33,7 @@ const FinancialDetail: React.FC = () => {
         headers: {
           'Content-Type': 'application/json'
         },
+        body: JSON.stringify(formData) // Send form data in the request body
       });
 
       if (!response.ok) {
@@ -45,6 +48,8 @@ const FinancialDetail: React.FC = () => {
         bankAccountNumber: '',
         bankHolderName: ''
       });
+
+      router.push('/documentDetails'); // Navigate to the financialDetails page upon successful form submission
     } catch (error) {
       console.error('Error:', error);
     }
