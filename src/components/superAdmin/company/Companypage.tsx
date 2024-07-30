@@ -28,6 +28,8 @@ const CompanyPage: React.FC = () => {
   const [mobile, setMobile]=useState<string>("");
   const [password, setPassword]=useState<string>("");
   const [data, setData] = useState<any[]>([]);
+  const [companyid, setCompanyid]=useState<string>("");
+  const [activeIndex, setActiveIndex]=useState(0)
   const handleAddCompanyClick = () => {
     setIsFormOpen(true);
   };
@@ -39,11 +41,11 @@ const CompanyPage: React.FC = () => {
   const handleSubmit=async()=>{
     try {
      
-      const response = await axios.post('http://localhost:6567/api/v1/user/signup', { name,  email, mobile, password},{
+      const response = await axios.post('http://localhost:6567/api/v1/user/signup', { name,  email, mobile, password, companyid},{
         withCredentials: true,
       });
       
-      if (response.status === 200) {
+      if (response.status === 201) {
         console.log("signup successful")
       }else{
         console.log("signup failed")
@@ -66,14 +68,14 @@ const CompanyPage: React.FC = () => {
             withCredentials: true,
           });
         setData(response.data);
-        // console.log("gdg",response.data)
+      //  console.log("gdg",response.data)
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
     fetchData()
   })
-  // console.log(data)
+ 
   const handleDelete = async (id: number) => {
     try {
       await axios.delete(`http://localhost:6567/api/v1/company/delete/${id}`,{
@@ -86,6 +88,7 @@ const CompanyPage: React.FC = () => {
       alert('Failed to delete company');
     }
   };
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
@@ -120,7 +123,11 @@ const CompanyPage: React.FC = () => {
                 <TableCell>
                 {index+1}
                 </TableCell>
-                <TableCell onClick={()=>{setOpen(true)}}>{company.compname}</TableCell>
+                <TableCell onClick={()=>{
+                  setOpen(true)
+                  setActiveIndex(index)
+                  setCompanyid(data[activeIndex].companyid)
+                  }}>{company.compname}</TableCell>
                 <TableCell>{company.phone}</TableCell>
                 <TableCell>{company.email}</TableCell>
                 <TableCell>{company.website}</TableCell>
@@ -146,7 +153,7 @@ const CompanyPage: React.FC = () => {
         open={open}
         onClose={()=>{setOpen(false)}}
       >
-        <form onSubmit={handleSubmit} className='w-full flex flex-col items-start justify-start gap-6 p-6'>
+        <div className='w-full flex flex-col items-start justify-start gap-6 p-6'>
         <TextField
           autoFocus
           margin="dense"
@@ -191,8 +198,8 @@ const CompanyPage: React.FC = () => {
           variant="outlined"
           required
         />
-        <button type='submit' className='py-3 w-full bg-blue-500 uppercase font-bold text-white rounded-md'>submit</button>
-        </form>
+        <button type='button' onClick={handleSubmit} className='py-3 w-full bg-blue-500 uppercase font-bold text-white rounded-md'>submit</button>
+        </div>
       </Dialog>
     </div>
   );

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 import { Dialog, DialogContent, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, TextField, Grid } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -15,25 +16,71 @@ interface EducationData {
   division: string;
 }
 
-const initialData: EducationData[] = [
-  {
-    id: 1,
-    degree: 'B.Tech',
-    university: 'XYZ University',
-    board: 'ABC Board',
-    passingYear: 2020,
-    percentage: 85,
-    division: 'First'
-  },
-];
-
 const EducationDetails: React.FC = () => {
   const router = useRouter();
-  const [educationData, setEducationData] = useState<EducationData[]>(initialData);
+  const [educationData, setEducationData] = useState<EducationData[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState<Partial<EducationData>>({});
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
+  // Fetch Education Data
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('http://localhost:6567/api/v1/education/getall', {
+        withCredentials: true,
+      });
+      setEducationData(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  });
+
+  // Handle Submit (Add or Update)
+  const handleSubmit = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (editingIndex !== null) {
+        // Update existing record
+        await axios.post(`http://localhost:6567/api/v1/education/update/${educationData[editingIndex].id}`, formData, {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        alert('Education record updated successfully!');
+      } else {
+        // Create new record
+        await axios.post('http://localhost:6567/api/v1/education/create', formData, {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        alert('Education record created successfully!');
+      }
+      fetchData();
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Error submitting data:', error);
+      alert('Error submitting data');
+    }
+  };
+
+  // Handle Delete
+  const handleDelete = async (id: number) => {
+    try {
+      await axios.delete(`http://localhost:6567/api/v1/education/delete/${id}`, {
+        withCredentials: true,
+      });
+      setEducationData(educationData.filter((item) => item.id !== id));
+      alert('Education record deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting record:', error);
+      alert('Failed to delete record');
+    }
+  };
+
+  // Handle Dialog Open
   const handleOpenDialog = (index?: number) => {
     setEditingIndex(index ?? null);
     if (index !== undefined) {
@@ -44,37 +91,19 @@ const EducationDetails: React.FC = () => {
     setOpenDialog(true);
   };
 
+  // Handle Dialog Close
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setFormData({});
   };
 
+  // Handle Input Change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value
     });
-  };
-
-  const handleSubmit = () => {
-    if (editingIndex !== null) {
-      const updatedData = educationData.map((item, index) =>
-        index === editingIndex ? { ...item, ...formData } : item
-      );
-      setEducationData(updatedData);
-    } else {
-      setEducationData([
-        ...educationData,
-        { id: educationData.length + 1, ...formData } as EducationData
-      ]);
-    }
-    handleCloseDialog();
-    router.push('/experienceDetails'); // Replace with the desired route
-  };
-
-  const handleDelete = (index: number) => {
-    setEducationData(educationData.filter((_, i) => i !== index));
   };
 
   return (
@@ -118,7 +147,7 @@ const EducationDetails: React.FC = () => {
                   <IconButton onClick={() => handleOpenDialog(index)}>
                     <EditIcon />
                   </IconButton>
-                  <IconButton onClick={() => handleDelete(index)}>
+                  <IconButton onClick={() => handleDelete(row.id)}>
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>

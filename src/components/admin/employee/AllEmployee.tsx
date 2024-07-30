@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PeopleIcon from '@mui/icons-material/People';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
@@ -15,11 +15,14 @@ import {
   Paper,
   IconButton
 } from '@mui/material';
+import BulkUpload from './BulkUpload';
 
 export default function AllEmployee() {
+  const [open, setOpen]=useState(false)
   const router= useRouter()
   return (
     <section className='w-full main-containerAdmin flex flex-col items-start justify-start gap-6 my-2'>
+      <BulkUpload open={open} setOpen={setOpen}/>
         <div className='w-full flex flex-col gap-8'>
           <span className='flex items-center justify-start gap-2'>
             <PeopleIcon className='!text-3xl'/>
@@ -33,7 +36,7 @@ export default function AllEmployee() {
               </span>
             </div>
             <div className='w-full flex items-center justify-start gap-8'>
-                <button className='px-8 py-2 rounded-full bg-gradient-to-t from-[#6B23CA] to-[#F4ECFF] flex items-center justify-start gap-2 text-base font-bold capitalize shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)]'> <FileUploadIcon/> bulk upload</button>
+                <button className='px-8 py-2 rounded-full bg-gradient-to-t from-[#6B23CA] to-[#F4ECFF] flex items-center justify-start gap-2 text-base font-bold capitalize shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)]' onClick={()=>{setOpen(true)}}> <FileUploadIcon/> bulk upload</button>
                 <button className='px-8 py-2 rounded-full bg-gradient-to-t from-[#5F1B81] to-[#5A12CF] flex items-center justify-start gap-2 text-base font-bold capitalize text-white shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)]' onClick={()=>{router.push("/addEmployee")}}>add employee</button>
             </div> 
           </div>

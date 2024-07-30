@@ -25,7 +25,7 @@ const GradeList: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  });
 
   const handleDelete = async (id: number) => {
     try {

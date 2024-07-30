@@ -4,13 +4,15 @@ import {
   Button,
   Grid,
   Typography,
+  FormControl,
+  InputLabel,
   Select,
   MenuItem,
-  InputLabel,
-  FormControl,
+  FormHelperText,
   SelectChangeEvent
 } from '@mui/material';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 interface ProfessionalDetailsFormValues {
   companyName: string;
@@ -20,18 +22,19 @@ interface ProfessionalDetailsFormValues {
   location: string;
   division: string;
   grade: string;
-  reportingManager: string;
+  reportingManagerName: string;
   employmentType: string;
   dateOfHire: string;
-  workEmail: string;
-  cugNo: string;
-  biometricId: string;
-  panNo: string;
-  adharNo: string;
-  uanNo: string;
-  esicNo: string;
-  voterId: string;
+  workEmailID: string;
+  cugNumber: string;
+  biometricID: string;
+  panNumber: string;
+  aadhaarNumber: string;
+  uanNumber: string;
+  esicNumber: string;
+  voterIDNumber: string;
   drivingLicense: string;
+  status: string;
 }
 
 const ProfessionalDetails: React.FC = () => {
@@ -43,20 +46,23 @@ const ProfessionalDetails: React.FC = () => {
     location: '',
     division: '',
     grade: '',
-    reportingManager: '',
+    reportingManagerName: '',
     employmentType: '',
     dateOfHire: '',
-    workEmail: '',
-    cugNo: '',
-    biometricId: '',
-    panNo: '',
-    adharNo: '',
-    uanNo: '',
-    esicNo: '',
-    voterId: '',
-    drivingLicense: ''
+    workEmailID: '',
+    cugNumber: '',
+    biometricID: '',
+    panNumber: '',
+    aadhaarNumber: '',
+    uanNumber: '',
+    esicNumber: '',
+    voterIDNumber: '',
+    drivingLicense: '',
+    status: ''
   });
 
+  const [error, setError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<any>({});
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,9 +81,41 @@ const ProfessionalDetails: React.FC = () => {
     });
   };
 
-  const handleSubmit = () => {
-    // Save form data and navigate to the next step or final step
-    router.push('/documentDetails');
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+    if (!formValues.companyName) errors.companyName = 'Company Name is required';
+    if (!formValues.status) errors.status = 'Status is required';
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      setError('Please fix the errors in the form');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError('No token found');
+        return;
+      }
+
+      const response = await axios.post('http://localhost:6567/api/v1/professional/create', formValues, {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.status === 201) {
+        router.push('/educationDetails');
+      }
+    } catch (error: any) {
+      console.error('Error submitting data:', error.response?.data || error.message);
+      setError(`Error submitting data: ${error.response?.data?.message || error.message}`);
+    }
   };
 
   return (
@@ -85,7 +123,8 @@ const ProfessionalDetails: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Professional Details
       </Typography>
-      <form className="space-y-4 mt-4">
+      {error && <Typography color="error">{error}</Typography>}
+      <form className="space-y-4 mt-4" onSubmit={handleSubmit}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -94,6 +133,8 @@ const ProfessionalDetails: React.FC = () => {
               name="companyName"
               value={formValues.companyName}
               onChange={handleChange}
+              error={!!formErrors.companyName}
+              helperText={formErrors.companyName}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -142,49 +183,38 @@ const ProfessionalDetails: React.FC = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <InputLabel>Grade</InputLabel>
-              <Select
-                name="grade"
-                value={formValues.grade}
-                onChange={handleSelectChange}
-              >
-                <MenuItem value="Junior">Junior</MenuItem>
-                <MenuItem value="Senior">Senior</MenuItem>
-                <MenuItem value="Lead">Lead</MenuItem>
-                <MenuItem value="Manager">Manager</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="Reporting Manager"
-              name="reportingManager"
-              value={formValues.reportingManager}
+              label="Grade"
+              name="grade"
+              value={formValues.grade}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <InputLabel>Employment Type</InputLabel>
-              <Select
-                name="employmentType"
-                value={formValues.employmentType}
-                onChange={handleSelectChange}
-              >
-                <MenuItem value="Full-Time">Full-Time</MenuItem>
-                <MenuItem value="Part-Time">Part-Time</MenuItem>
-                <MenuItem value="Contract">Contract</MenuItem>
-              </Select>
-            </FormControl>
+            <TextField
+              fullWidth
+              label="Reporting Manager Name"
+              name="reportingManagerName"
+              value={formValues.reportingManagerName}
+              onChange={handleChange}
+            />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
+              label="Employment Type"
+              name="employmentType"
+              value={formValues.employmentType}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              type="date"
               label="Date of Hire"
               name="dateOfHire"
-              type="date"
               value={formValues.dateOfHire}
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
@@ -193,18 +223,18 @@ const ProfessionalDetails: React.FC = () => {
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="Work Email"
-              name="workEmail"
-              value={formValues.workEmail}
+              label="Work Email ID"
+              name="workEmailID"
+              value={formValues.workEmailID}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="CUG No"
-              name="cugNo"
-              value={formValues.cugNo}
+              label="CUG Number"
+              name="cugNumber"
+              value={formValues.cugNumber}
               onChange={handleChange}
             />
           </Grid>
@@ -212,53 +242,53 @@ const ProfessionalDetails: React.FC = () => {
             <TextField
               fullWidth
               label="Biometric ID"
-              name="biometricId"
-              value={formValues.biometricId}
+              name="biometricID"
+              value={formValues.biometricID}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="PAN No"
-              name="panNo"
-              value={formValues.panNo}
+              label="PAN Number"
+              name="panNumber"
+              value={formValues.panNumber}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="Aadhaar No"
-              name="adharNo"
-              value={formValues.adharNo}
+              label="Aadhaar Number"
+              name="aadhaarNumber"
+              value={formValues.aadhaarNumber}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="UAN No"
-              name="uanNo"
-              value={formValues.uanNo}
+              label="UAN Number"
+              name="uanNumber"
+              value={formValues.uanNumber}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="ESIC No"
-              name="esicNo"
-              value={formValues.esicNo}
+              label="ESIC Number"
+              name="esicNumber"
+              value={formValues.esicNumber}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="Voter ID"
-              name="voterId"
-              value={formValues.voterId}
+              label="Voter ID Number"
+              name="voterIDNumber"
+              value={formValues.voterIDNumber}
               onChange={handleChange}
             />
           </Grid>
@@ -271,17 +301,24 @@ const ProfessionalDetails: React.FC = () => {
               onChange={handleChange}
             />
           </Grid>
-          <Grid item xs={12} className="text-right">
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              onClick={handleSubmit}
-            >
-              Submit
-            </Button>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth error={!!formErrors.status}>
+              <InputLabel>Status</InputLabel>
+              <Select
+                name="status"
+                value={formValues.status}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>
+              </Select>
+              <FormHelperText>{formErrors.status}</FormHelperText>
+            </FormControl>
           </Grid>
         </Grid>
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+          Submit
+        </Button>
       </form>
     </div>
   );
