@@ -4,7 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import AddDesignationList from './AddDesignationList';
-
+import Swal from 'sweetalert2';
 const DesignationList: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
@@ -30,10 +30,19 @@ const DesignationList: React.FC = () => {
         withCredentials: true,
       });
       setData(data.filter((item: any) => item.sl !== id));
-      alert('Designation deleted successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Designation deleted successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
     } catch (error) {
       console.error('Error deleting designation:', error);
-      alert('Failed to delete designation');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to delete designation ",
+      });
     }
   };
 

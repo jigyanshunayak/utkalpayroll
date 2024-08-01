@@ -4,7 +4,7 @@ import AddReimbursement from './AddReimbursmentLists';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 const ReimbursementList: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<any>([]);
@@ -15,10 +15,19 @@ const ReimbursementList: React.FC = () => {
         withCredentials: true,
       });
       setData(data.filter((item: any) => item.sl !== id));
-      alert('Reimbursement deleted successfully!');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to add reimbursement",
+      });
+      setOpen(false);
     } catch (error) {
       console.error('Error deleting reimbursement:', error);
-      alert('Failed to delete reimbursement');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to delete Reimbursement Type ",
+      });
     }
   };
 

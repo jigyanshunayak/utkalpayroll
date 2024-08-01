@@ -4,7 +4,7 @@ import AddResignationList from './AddResignationList';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 const ResignationTypeList: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<any>([]);
@@ -15,10 +15,19 @@ const ResignationTypeList: React.FC = () => {
         withCredentials: true,
       });
       setData(data.filter((item: any) => item.sl !== id));
-      alert('Type deleted successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Resignation Type deleted successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
     } catch (error) {
       console.error('Error deleting type:', error);
-      alert('Failed to delete type');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to delete Resignation Type ",
+      });
     }
   };
 

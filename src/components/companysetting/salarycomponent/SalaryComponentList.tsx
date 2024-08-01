@@ -4,7 +4,7 @@ import AddSalaryComponentList from './AddSalaryComponentList';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 const SalaryComponentList: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<any>([]);
@@ -15,10 +15,19 @@ const SalaryComponentList: React.FC = () => {
         withCredentials: true,
       });
       setData(data.filter((item: any) => item.sl !== id));
-      alert('Component deleted successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Salary Component deleted successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
     } catch (error) {
       console.error('Error deleting component:', error);
-      alert('Failed to delete component');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to delete Salary Component ",
+      });
     }
   };
 

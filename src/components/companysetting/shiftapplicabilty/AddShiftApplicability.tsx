@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 interface AddShiftApplicabilityProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -30,13 +30,23 @@ const AddShiftApplicability: React.FC<AddShiftApplicabilityProps> = ({ open, set
       });
 
       if (response.status === 201) {
-        alert('Shift applicability added successfully!');
+        Swal.fire({
+          icon: 'success',
+          title: 'Shift applicability added successfully!',
+          showConfirmButton: false,
+          timer: 1700
+        });
         setShiftName('');
         setOpen(false);
       }
     } catch (error) {
       console.error('Error adding shift applicability:', error);
-      alert('Failed to add shift applicability');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to add shift applicability",
+      });
+      setOpen(false);
     }
   };
 

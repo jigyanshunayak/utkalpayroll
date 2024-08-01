@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 interface DialogComponentProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -31,14 +31,24 @@ const AddLeavePolicy: React.FC<DialogComponentProps> = ({ open, setOpen }) => {
       });
 
       if (response.status === 201) {
-        alert('Leave Policy Created successfully!!!');
+        Swal.fire({
+          icon: 'success',
+          title: 'Leave Policy Created successfully!!!',
+          showConfirmButton: false,
+          timer: 1700
+        });
         setOpen(false);
       } else {
         alert('Error creating leave policy');
       }
     } catch (error) {
       console.error('There was an error!', error);
-      alert('Error creating leave policy');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Error creating leave policy",
+      });
+      setOpen(false);
     }
   };
 

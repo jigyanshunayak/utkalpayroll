@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 interface DialogComponentProps {
   open: boolean;
   handleClose: () => void;
@@ -24,13 +25,23 @@ const  AddSalaryComponentList= ({open, setOpen}:any) => {
       }, {
         withCredentials: true,
       });
-      alert('Component added successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Salary Component added successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
       setComponentName("");
       setOpen(false);
       window.location.reload();
     } catch (error) {
       console.error('Error adding component:', error);
-      alert('Failed to add component');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to add Salary Component",
+      });
+      setOpen(false);
     }
   };
 

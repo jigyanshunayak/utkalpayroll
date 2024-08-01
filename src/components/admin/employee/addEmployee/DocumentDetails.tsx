@@ -27,7 +27,6 @@ interface DocumentData {
   id: number;
   documentType: string;
   documentTitle: string;
-  file: string; // Store file name or path
 }
 
 const initialData: DocumentData[] = [];
@@ -69,7 +68,7 @@ const DocumentDetail: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    if (!formData.documentType || !formData.documentTitle || !formData.file) {
+    if (!formData.documentType || !formData.documentTitle) {
       alert("Please fill in all fields.");
       return;
     }
@@ -115,7 +114,6 @@ const DocumentDetail: React.FC = () => {
               <TableCell className="text-white font-bold text-xs text-center">Sl. No.</TableCell>
               <TableCell className="text-white font-bold text-xs text-center">Type of Document</TableCell>
               <TableCell className="text-white font-bold text-xs text-center">Document Title</TableCell>
-              <TableCell className="text-white font-bold text-xs text-center">File</TableCell>
               <TableCell className="text-white font-bold text-xs text-center">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -125,7 +123,6 @@ const DocumentDetail: React.FC = () => {
                 <TableCell className="text-black font-bold text-xs text-center">{index + 1}</TableCell>
                 <TableCell className="text-black font-bold text-xs text-center">{row.documentType}</TableCell>
                 <TableCell className="text-black font-bold text-xs text-center">{row.documentTitle}</TableCell>
-                <TableCell className="text-black font-bold text-xs text-center">{row.file}</TableCell>
                 <TableCell className="text-black font-bold text-xs text-center">
                   <IconButton onClick={() => handleOpenDialog(index)}>
                     <EditIcon />
@@ -171,23 +168,6 @@ const DocumentDetail: React.FC = () => {
                 value={formData.documentTitle || ''}
                 onChange={handleInputChange}
               />
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" component="label">
-                Upload File
-                <input
-                  type="file"
-                  hidden
-                  onChange={(e) => {
-                    if (e.target.files) {
-                      setFormData({
-                        ...formData,
-                        file: e.target.files[0].name // Store the file name
-                      });
-                    }
-                  }}
-                />
-              </Button>
             </Grid>
             <Grid item xs={12}>
               <Button variant="contained" color="primary" onClick={handleSubmit}>

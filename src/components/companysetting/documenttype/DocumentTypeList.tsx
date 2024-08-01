@@ -4,7 +4,7 @@ import AddDocumentType from './AddDocutmentTypeList';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 const DocumentTypeList: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<any>([]);
@@ -15,10 +15,19 @@ const DocumentTypeList: React.FC = () => {
         withCredentials: true,
       });
       setData(data.filter((item: any) => item.sl !== id));
-      alert('Document type deleted successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Document type deleted successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
     } catch (error) {
       console.error('Error deleting document type:', error);
-      alert('Failed to delete document type');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to delete document type ",
+      });
     }
   };
 

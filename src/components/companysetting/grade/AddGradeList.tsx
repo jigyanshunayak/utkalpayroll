@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 interface AddGradeListProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -29,11 +29,21 @@ const AddGradeList: React.FC<AddGradeListProps> = ({ open, setOpen, onGradeAdded
       });
 
       if (response.status === 201) {
-        alert('Grade Master Created successfully!!!');
+        Swal.fire({
+          icon: 'success',
+          title: 'Grade Master Created successfully!!!',
+          showConfirmButton: false,
+          timer: 1700
+        });
         setOpen(false);
         onGradeAdded(); // Call the callback to refresh the data
       } else {
-        alert('Error creating grade');
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Error creating grade",
+        });
+        setOpen(false);
       }
     } catch (error) {
       console.error('There was an error!', error);

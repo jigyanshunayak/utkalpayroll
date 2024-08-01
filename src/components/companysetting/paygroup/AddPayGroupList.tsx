@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 interface DialogComponentProps {
   open: boolean;
   handleClose: () => void;
@@ -28,15 +29,30 @@ const  AddPayGroupList= ({open, setOpen}:any) => {
       });
 
       if (response.status === 201) {
-        alert('PayGroup Created successfully!!!');
+        Swal.fire({
+          icon: 'success',
+          title: 'PayGroup Created successfully!!!',
+          showConfirmButton: false,
+          timer: 1700
+        });
         setOpen(false);
         // onDesignationAdded(); // Call the callback to refresh the data
       } else {
-        alert('Error creating PayGroup');
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Error creating PayGroup",
+        });
+        setOpen(false);
       }
     } catch (error) {
       console.error('There was an error!', error);
-      alert('Error creating PayGroup');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Error creating PayGroup",
+      });
+      setOpen(false);
     }
   };
 

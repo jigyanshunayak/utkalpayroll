@@ -1,61 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton,
-  TextField,
-  Grid
-} from '@mui/material';
+import axios from 'axios';
+import { Dialog, DialogContent, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, TextField, Grid } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRouter } from 'next/router';
 
 interface ExperienceData {
-  id: number;
-  organization: string;
-  startDate: string;
-  endDate: string;
-  designation: string;
-  annualCTC: number;
+  sl: number;
+  empid: string;
+  nameOfOrganization: string;
+  typeOfDocument: string;
+  documentTitle: string;
+  workingDurationStart: string;
+  workingDurationEnd: string;
+  status: number;
 }
-
-const API_URL = 'https://your-backend-api-endpoint.com/experience'; // Replace with your API URL
 
 const ExperienceDetails: React.FC = () => {
   const [experienceData, setExperienceData] = useState<ExperienceData[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<Partial<ExperienceData>>({});
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    // Fetch initial data from the backend
-    const fetchExperienceData = async () => {
-      try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error('Failed to fetch experience details');
-        const data: ExperienceData[] = await response.json();
-        setExperienceData(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
     fetchExperienceData();
-  }, []);
+  });
 
-  const handleOpenDialog = (index?: number) => {
-    setEditingIndex(index ?? null);
-    if (index !== undefined) {
-      setFormData(experienceData[index]);
+  const fetchExperienceData = async () => {
+    try {
+      const response = await axios.get('http://localhost:6567/api/v1/experience/getall', { withCredentials: true });
+      setExperienceData(response.data);
+    } catch (error) {
+      console.error('Error fetching experience data:', error);
+    }
+  };
+
+  const handleOpenDialog = (id?: number) => {
+    if (id !== undefined) {
+      const experience = experienceData.find((e) => e.sl === id);
+      if (experience) {
+        setFormData(experience);
+        setEditingId(id);
+      }
+    } else {
+      setFormData({});
+      setEditingId(null);
     }
     setOpenDialog(true);
   };
@@ -63,6 +54,7 @@ const ExperienceDetails: React.FC = () => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setFormData({});
+    setEditingId(null);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,59 +67,26 @@ const ExperienceDetails: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      if (editingIndex !== null) {
-        // Update existing record
-        const response = await fetch(`${API_URL}/${experienceData[editingIndex].id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
-        if (!response.ok) throw new Error('Failed to update experience details');
-        const updatedData: ExperienceData = await response.json();
-        const updatedExperienceData = experienceData.map((item, index) =>
-          index === editingIndex ? updatedData : item
-        );
-        setExperienceData(updatedExperienceData);
+      if (editingId === null) {
+        await axios.post('http://localhost:6567/api/v1/experience/create', formData, { withCredentials: true });
       } else {
-        // Add new record
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-
-        });
-        if (!response.ok) throw new Error('Failed to add experience details');
-        const newExperience: ExperienceData = await response.json();
-        setExperienceData([...experienceData, newExperience]);
+        await axios.put(`http://localhost:6567/api/v1/experience/update/${editingId}`, formData, { withCredentials: true });
       }
+      fetchExperienceData();
       handleCloseDialog();
-      router.push('/familyDetails');
+      router.push('/familyDetails'); // Adjust if needed
     } catch (error) {
-      console.error('Error submitting data:', error);
+      console.error('Error submitting form:', error);
     }
   };
 
-  const handleDelete = async (index: number) => {
+  const handleDelete = async (id: number) => {
     try {
-      const id = experienceData[index].id;
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: 'DELETE'
-      });
-      if (!response.ok) throw new Error('Failed to delete experience details');
-      setExperienceData(experienceData.filter((_, i) => i !== index));
+      await axios.delete(`http://localhost:6567/api/v1/experience/delete/${id}`);
+      fetchExperienceData();
     } catch (error) {
-      console.error('Error deleting data:', error);
+      console.error('Error deleting record:', error);
     }
-  };
-
-  const calculateDuration = (startDate: string, endDate: string) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const diff = end.getFullYear() - start.getFullYear();
-    return `${diff} years`;
   };
 
   return (
@@ -146,28 +105,32 @@ const ExperienceDetails: React.FC = () => {
       <TableContainer className="bg-white shadow-md rounded-md">
         <Table>
           <TableHead>
-            <TableRow className="bg-gradient-to-t from-[#6B23CA] to-[#F4ECFF] w-full h-3">
-              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">Sl. No.</TableCell>
-              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">Name of Organization</TableCell>
-              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">Designation</TableCell>
-              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">Annual CTC</TableCell>
-              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">Working Duration</TableCell>
-              <TableCell className="text-white font-bold text-xs text-center shadow-[-4px_4px_27px_0px_#6B23CA]">Action</TableCell>
+            <TableRow className="bg-gradient-to-t from-[#6B23CA] to-[#F4ECFF]">
+              <TableCell className="text-white font-bold text-xs text-center">ID</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center">Emp ID</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center">Organization</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center">Document Type</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center">Document Title</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center">Start Date</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center">End Date</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {experienceData.map((row, index) => (
-              <TableRow key={row.id}>
-                <TableCell className="text-black font-bold text-xs text-center">{index + 1}</TableCell>
-                <TableCell className="text-black font-bold text-xs text-center">{row.organization}</TableCell>
-                <TableCell className="text-black font-bold text-xs text-center">{row.designation}</TableCell>
-                <TableCell className="text-black font-bold text-xs text-center">{row.annualCTC}</TableCell>
-                <TableCell className="text-black font-bold text-xs text-center">{calculateDuration(row.startDate, row.endDate)}</TableCell>
-                <TableCell className="text-black font-bold text-xs text-center">
-                  <IconButton onClick={() => handleOpenDialog(index)}>
+            {experienceData.map((exp) => (
+              <TableRow key={exp.sl}>
+                <TableCell>{exp.sl}</TableCell>
+                <TableCell>{exp.empid}</TableCell>
+                <TableCell>{exp.nameOfOrganization}</TableCell>
+                <TableCell>{exp.typeOfDocument}</TableCell>
+                <TableCell>{exp.documentTitle}</TableCell>
+                <TableCell>{exp.workingDurationStart}</TableCell>
+                <TableCell>{exp.workingDurationEnd}</TableCell>
+                <TableCell>
+                  <IconButton onClick={() => handleOpenDialog(exp.sl)}>
                     <EditIcon />
                   </IconButton>
-                  <IconButton onClick={() => handleDelete(index)}>
+                  <IconButton onClick={() => handleDelete(exp.sl)}>
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
@@ -177,66 +140,75 @@ const ExperienceDetails: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogContent>
-          <h2 className="text-xl font-bold mb-4">{editingIndex !== null ? 'Edit Experience' : 'Add Experience'}</h2>
-          <Grid container spacing={3}>
+          <h2 className="text-xl font-bold mb-4">{editingId ? 'Edit Experience' : 'Add Experience'}</h2>
+          <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Name of Organization"
-                name="organization"
-                value={formData.organization || ''}
+                label="Employee ID"
+                name="empid"
+                value={formData.empid || ''}
                 onChange={handleInputChange}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Start Date"
-                name="startDate"
+                label="Organization"
+                name="nameOfOrganization"
+                value={formData.nameOfOrganization || ''}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Document Type"
+                name="typeOfDocument"
+                value={formData.typeOfDocument || ''}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Document Title"
+                name="documentTitle"
+                value={formData.documentTitle || ''}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Working Duration Start"
+                name="workingDurationStart"
                 type="date"
-                value={formData.startDate || ''}
+                value={formData.workingDurationStart || ''}
                 onChange={handleInputChange}
-                InputLabelProps={{ shrink: true }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="End Date"
-                name="endDate"
+                label="Working Duration End"
+                name="workingDurationEnd"
                 type="date"
-                value={formData.endDate || ''}
-                onChange={handleInputChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Designation"
-                name="designation"
-                value={formData.designation || ''}
+                value={formData.workingDurationEnd || ''}
                 onChange={handleInputChange}
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Annual CTC"
-                name="annualCTC"
-                type="number"
-                value={formData.annualCTC || ''}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" onClick={handleSubmit}>
-                {editingIndex !== null ? 'Update' : 'Submit'}
-              </Button>
             </Grid>
           </Grid>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            className="mt-4"
+          >
+            {editingId ? 'Update' : 'Submit'}
+          </Button>
         </DialogContent>
       </Dialog>
     </div>

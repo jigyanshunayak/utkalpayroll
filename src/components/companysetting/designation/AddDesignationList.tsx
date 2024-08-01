@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 interface AddDesignationListProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -29,15 +29,30 @@ const AddDesignationList: React.FC<AddDesignationListProps> = ({ open, setOpen, 
       });
 
       if (response.status === 201) {
-        alert('Designation Created successfully!!!');
+        Swal.fire({
+          icon: 'success',
+          title: 'Designation Created successfully!!!',
+          showConfirmButton: false,
+          timer: 1700
+        });
         setOpen(false);
         onDesignationAdded();
       } else {
-        alert('Error creating designation');
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Error creating designation",
+        });
+        setOpen(false);
       }
     } catch (error) {
       console.error('There was an error!', error);
-      alert('Error creating designation');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Error creating designation",
+      });
+      setOpen(false);
     }
   };
 

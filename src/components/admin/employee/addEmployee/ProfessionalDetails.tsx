@@ -15,6 +15,7 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 
 interface ProfessionalDetailsFormValues {
+  empid: string;
   companyName: string;
   designation: string;
   department: string;
@@ -39,6 +40,7 @@ interface ProfessionalDetailsFormValues {
 
 const ProfessionalDetails: React.FC = () => {
   const [formValues, setFormValues] = useState<ProfessionalDetailsFormValues>({
+    empid:'',
     companyName: '',
     designation: '',
     department: '',
@@ -82,50 +84,52 @@ const ProfessionalDetails: React.FC = () => {
   };
 
   const validateForm = () => {
-    const errors: { [key: string]: string } = {};
-    if (!formValues.companyName) errors.companyName = 'Company Name is required';
-    if (!formValues.status) errors.status = 'Status is required';
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    const newErrors: any = {};
+    if (!formValues.companyName) {
+      newErrors.companyName = 'Company Name is required';
+    }
+    if (!formValues.status) {
+      newErrors.status = 'Status is required';
+    }
+    setFormErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    console.log('Form Values:', formValues); // Debugging: log form values before submission
     if (!validateForm()) {
-      setError('Please fix the errors in the form');
+      console.log('Form Errors:', formErrors); // Debugging: log form errors if validation fails
       return;
     }
-
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError('No token found');
-        return;
-      }
-
-      const response = await axios.post('http://localhost:6567/api/v1/professional/create', formValues, {
-        withCredentials: true,
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
+      const response = await axios.post('http://localhost:6567/api/v1/professional/create', formValues);
+      console.log('Response:', response.data); // Debugging: log API response
       if (response.status === 201) {
-        router.push('/educationDetails');
+        router.push('/educationDetails');  // Redirect to dashboard or any other page
       }
-    } catch (error: any) {
-      console.error('Error submitting data:', error.response?.data || error.message);
-      setError(`Error submitting data: ${error.response?.data?.message || error.message}`);
+    } catch (error) {
+      console.error('Submission Error:', error); // Debugging: log submission error
+      setError('Failed to submit form. Please try again.');
     }
   };
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
+    <div>
       <Typography variant="h4" gutterBottom>
         Professional Details
       </Typography>
-      {error && <Typography color="error">{error}</Typography>}
-      <form className="space-y-4 mt-4" onSubmit={handleSubmit}>
-        <Grid container spacing={3}>
+      <form onSubmit={handleSubmit}>
+        <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Employee id"
+              name="empid"
+              value={formValues.empid}
+              onChange={handleChange}
+            />
+          </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -212,9 +216,9 @@ const ProfessionalDetails: React.FC = () => {
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              type="date"
               label="Date of Hire"
               name="dateOfHire"
+              type="date"
               value={formValues.dateOfHire}
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
@@ -305,6 +309,7 @@ const ProfessionalDetails: React.FC = () => {
             <FormControl fullWidth error={!!formErrors.status}>
               <InputLabel>Status</InputLabel>
               <Select
+                label="Status"
                 name="status"
                 value={formValues.status}
                 onChange={handleSelectChange}
@@ -312,13 +317,16 @@ const ProfessionalDetails: React.FC = () => {
                 <MenuItem value="Active">Active</MenuItem>
                 <MenuItem value="Inactive">Inactive</MenuItem>
               </Select>
-              <FormHelperText>{formErrors.status}</FormHelperText>
+              {formErrors.status && (
+                <FormHelperText>{formErrors.status}</FormHelperText>
+              )}
             </FormControl>
           </Grid>
         </Grid>
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          Submit
+        <Button type="submit" variant="contained" color="primary" onClick={handleSubmit}>
+          save
         </Button>
+        {error && <Typography color="error">{error}</Typography>}
       </form>
     </div>
   );

@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 interface AddReimbursementProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -26,13 +26,23 @@ const AddReimbursement: React.FC<AddReimbursementProps> = ({ open, setOpen }) =>
       }, {
         withCredentials: true,
       });
-      alert('Reimbursement added successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Reimbursement added successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
       setReimbursementName("");
       setOpen(false);
       window.location.reload();
     } catch (error) {
       console.error('Error adding reimbursement:', error);
-      alert('Failed to add reimbursement');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to add reimbursement",
+      });
+      setOpen(false);
     }
   };
   return (

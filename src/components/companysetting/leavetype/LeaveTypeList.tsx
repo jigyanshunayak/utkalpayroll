@@ -6,6 +6,7 @@ import AddLeavetypeList from './AddLeavetypeList';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 const data ={
   value:"hr department"
 }
@@ -22,10 +23,19 @@ const LeaveTypeList: React.FC = () => {
         withCredentials: true,
       });
       setData(data.filter((item: any) => item.sl !== id));
-      alert('leave deleted successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Leave deleted successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
     } catch (error) {
       console.error('Error deleting grade:', error);
-      alert('Failed to delete leave');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to delete leave ",
+      });
     }
   };
 

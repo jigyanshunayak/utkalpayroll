@@ -5,7 +5,7 @@ import AddLeavepolicyList from './AddLeavepolicyList';
 import axios from 'axios';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
-
+import Swal from 'sweetalert2';
 const LeavePolicyList: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
@@ -14,10 +14,19 @@ const LeavePolicyList: React.FC = () => {
     try {
       await axios.delete(`http://localhost:6567/api/v1/leavepolicy/delete/${sl}`, { withCredentials: true });
       setData(data.filter((item) => item.sl !== sl));
-      alert('Leave Policy deleted successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Leave Policy deleted successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
     } catch (error) {
       console.error('Error deleting leave policy:', error);
-      alert('Failed to delete leave policy');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to delete leave policy ",
+      });
     }
   };
 

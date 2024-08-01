@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 interface AddDocumentTypeProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -26,13 +26,23 @@ const AddDocumentType: React.FC<AddDocumentTypeProps> = ({ open, setOpen }) => {
       }, {
         withCredentials: true,
       });
-      alert('Document type added successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Document type added successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
       setDocumentTypeName("");
       setOpen(false);
       window.location.reload();
     } catch (error) {
       console.error('Error adding document type:', error);
-      alert('Failed to add document type');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to add document type",
+      });
+      setOpen(false);
     }
   };
 

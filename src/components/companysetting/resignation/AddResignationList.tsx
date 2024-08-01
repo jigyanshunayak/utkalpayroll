@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 interface AddResignationTypeProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -26,13 +26,23 @@ const AddResignationList: React.FC<AddResignationTypeProps> = ({ open, setOpen }
       }, {
         withCredentials: true,
       });
-      alert('Type added successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Resignation Type added successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
       setTypeName("");
       setOpen(false);
       window.location.reload();
     } catch (error) {
       console.error('Error adding type:', error);
-      alert('Failed to add type');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to add Resignation Type",
+      });
+      setOpen(false);
     }
   };
 

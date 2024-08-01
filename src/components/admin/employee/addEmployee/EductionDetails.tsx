@@ -1,109 +1,93 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import axios from 'axios';
 import { Dialog, DialogContent, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, TextField, Grid } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useRouter } from 'next/router';
 
 interface EducationData {
-  id: number;
+  sl: number;
+  empid: string;
   degree: string;
   university: string;
   board: string;
   passingYear: number;
-  percentage: number;
+  passingPercentage: number;
   division: string;
+  status: number;
 }
 
 const EducationDetails: React.FC = () => {
-  const router = useRouter();
   const [educationData, setEducationData] = useState<EducationData[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<Partial<EducationData>>({});
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-
-  // Fetch Education Data
-  const fetchData = async () => {
-    try {
-      const response = await axios.get('http://localhost:6567/api/v1/education/getall', {
-        withCredentials: true,
-      });
-      setEducationData(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+  const router = useRouter();
 
   useEffect(() => {
-    fetchData();
+    fetchEducationData();
   });
 
-  // Handle Submit (Add or Update)
-  const handleSubmit = async () => {
+  const fetchEducationData = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (editingIndex !== null) {
-        // Update existing record
-        await axios.post(`http://localhost:6567/api/v1/education/update/${educationData[editingIndex].id}`, formData, {
-          withCredentials: true,
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        alert('Education record updated successfully!');
-      } else {
-        // Create new record
-        await axios.post('http://localhost:6567/api/v1/education/create', formData, {
-          withCredentials: true,
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        alert('Education record created successfully!');
+      const response = await axios.get('http://localhost:6567/api/v1/education/getall', { withCredentials: true });
+      setEducationData(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleOpenDialog = (id?: number) => {
+    if (id !== undefined) {
+      const education = educationData.find((e) => e.sl === id);
+      if (education) {
+        setFormData(education);
+        setEditingId(id);
       }
-      fetchData();
-      handleCloseDialog();
-    } catch (error) {
-      console.error('Error submitting data:', error);
-      alert('Error submitting data');
-    }
-  };
-
-  // Handle Delete
-  const handleDelete = async (id: number) => {
-    try {
-      await axios.delete(`http://localhost:6567/api/v1/education/delete/${id}`, {
-        withCredentials: true,
-      });
-      setEducationData(educationData.filter((item) => item.id !== id));
-      alert('Education record deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting record:', error);
-      alert('Failed to delete record');
-    }
-  };
-
-  // Handle Dialog Open
-  const handleOpenDialog = (index?: number) => {
-    setEditingIndex(index ?? null);
-    if (index !== undefined) {
-      setFormData(educationData[index]);
     } else {
       setFormData({});
+      setEditingId(null);
     }
     setOpenDialog(true);
   };
 
-  // Handle Dialog Close
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setFormData({});
+    setEditingId(null);
   };
 
-  // Handle Input Change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value
     });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (editingId === null) {
+        await axios.post('http://localhost:6567/api/v1/education/create', formData, { withCredentials: true });
+      } else {
+        await axios.post(`http://localhost:6567/api/v1/education/update/${editingId}`, formData, { withCredentials: true });
+      }
+      fetchEducationData();
+      handleCloseDialog();
+      router.push('/experienceDetails'); // Navigate to /education after submit
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await axios.delete(`http://localhost:6567/api/v1/education/delete/${id}`);
+      fetchEducationData();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -124,30 +108,32 @@ const EducationDetails: React.FC = () => {
           <TableHead>
             <TableRow className="bg-gradient-to-t from-[#6B23CA] to-[#F4ECFF]">
               <TableCell className="text-white font-bold text-xs text-center">Sl. No.</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center">empid</TableCell>
               <TableCell className="text-white font-bold text-xs text-center">Degree</TableCell>
               <TableCell className="text-white font-bold text-xs text-center">University</TableCell>
               <TableCell className="text-white font-bold text-xs text-center">Board</TableCell>
               <TableCell className="text-white font-bold text-xs text-center">Passing Year</TableCell>
               <TableCell className="text-white font-bold text-xs text-center">Percentage</TableCell>
               <TableCell className="text-white font-bold text-xs text-center">Division</TableCell>
-              <TableCell className="text-white font-bold text-xs text-center">Action</TableCell>
+              <TableCell className="text-white font-bold text-xs text-center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {educationData.map((row, index) => (
-              <TableRow key={row.id}>
-                <TableCell className="text-black text-xs text-center">{index + 1}</TableCell>
-                <TableCell className="text-black text-xs text-center">{row.degree}</TableCell>
-                <TableCell className="text-black text-xs text-center">{row.university}</TableCell>
-                <TableCell className="text-black text-xs text-center">{row.board}</TableCell>
-                <TableCell className="text-black text-xs text-center">{row.passingYear}</TableCell>
-                <TableCell className="text-black text-xs text-center">{row.percentage}</TableCell>
-                <TableCell className="text-black text-xs text-center">{row.division}</TableCell>
-                <TableCell className="text-xs text-center">
-                  <IconButton onClick={() => handleOpenDialog(index)}>
+            {educationData.map((edu) => (
+              <TableRow key={edu.sl}>
+                <TableCell>{edu.sl}</TableCell>
+                <TableCell>{edu.empid}</TableCell>
+                <TableCell>{edu.degree}</TableCell>
+                <TableCell>{edu.university}</TableCell>
+                <TableCell>{edu.board}</TableCell>
+                <TableCell>{edu.passingYear}</TableCell>
+                <TableCell>{edu.passingPercentage}</TableCell>
+                <TableCell>{edu.division}</TableCell>
+                <TableCell>
+                  <IconButton onClick={() => handleOpenDialog(edu.sl)}>
                     <EditIcon />
                   </IconButton>
-                  <IconButton onClick={() => handleDelete(row.id)}>
+                  <IconButton onClick={() => handleDelete(edu.sl)}>
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
@@ -157,10 +143,19 @@ const EducationDetails: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogContent>
-          <h2 className="text-xl font-bold mb-4">{editingIndex !== null ? 'Edit Education' : 'Add Education'}</h2>
-          <Grid container spacing={3}>
+          <h2 className="text-xl font-bold mb-4">{editingId ? 'Edit Education' : 'Add Education'}</h2>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Employee ID"
+                name="empid"
+                value={formData.empid || ''}
+                onChange={handleInputChange}
+              />
+            </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -201,10 +196,10 @@ const EducationDetails: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Percentage"
-                name="percentage"
+                label="Passing Percentage"
+                name="passingPercentage"
                 type="number"
-                value={formData.percentage || ''}
+                value={formData.passingPercentage || ''}
                 onChange={handleInputChange}
               />
             </Grid>
@@ -217,12 +212,15 @@ const EducationDetails: React.FC = () => {
                 onChange={handleInputChange}
               />
             </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" onClick={handleSubmit}>
-                {editingIndex !== null ? 'Update' : 'Submit'}
-              </Button>
-            </Grid>
           </Grid>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            className="mt-4"
+          >
+            {editingId ? 'Update' : 'Submit'}
+          </Button>
         </DialogContent>
       </Dialog>
     </div>

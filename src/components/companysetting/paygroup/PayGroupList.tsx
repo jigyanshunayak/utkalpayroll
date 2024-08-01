@@ -4,7 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import React, { useEffect, useState } from 'react';
 import AddPayGroupList from './AddPayGroupList';
 import axios from 'axios';
-
+import Swal from 'sweetalert2';
 const PayGroupList: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<any>([]);
@@ -15,10 +15,19 @@ const PayGroupList: React.FC = () => {
         withCredentials: true,
       });
       setData(data.filter((item: any) => item.sl !== id));
-      alert('PayGroup deleted successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'PayGroup deleted successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
     } catch (error) {
       console.error('Error deleting paygroup:', error);
-      alert('Failed to delete paygroup');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to delete paygroup ",
+      });
     }
   };
 

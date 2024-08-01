@@ -4,6 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DepartmentCard from '../../card/DepartmentCard';
 import AddGradeList from './AddGradeList';
 import Cookies from 'js-cookie';
+import Swal from 'sweetalert2';
 const GradeList: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
@@ -33,10 +34,19 @@ const GradeList: React.FC = () => {
         withCredentials: true,
       });
       setData(data.filter((item: any) => item.sl !== id));
-      alert('Grade deleted successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Grade deleted successfully!',
+        showConfirmButton: false,
+        timer: 1700
+      });
     } catch (error) {
       console.error('Error deleting grade:', error);
-      alert('Failed to delete grade');
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to delete grade ",
+      });
     }
   };
 
